@@ -1,0 +1,15 @@
+trainee,1,John,Doe,true,1995-03-15,123 Main St, NY
+trainee,2,Alice,Johnson,false,2000-07-22,456 Oak Rd, CA
+trainee,3,Bob,Smith,true,1992-05-10,789 Pine Ln, TX
+trainee,4,Emma,Williams,true,1998-11-30,321 Cedar St, FL
+trainee,5,Daniel,Davis,false,2001-04-05,654 Birch Ave, WA
+trainer,1,Michael,Brown,true,Yoga
+trainer,2,Emily,Davis,true,Boxing
+trainer,3,James,Wilson,false,Crossfit
+trainer,4,Sophia,Moore,true,Strength Training
+trainer,5,William,Lee,true,Pilates
+training,1,2,Yoga,Yoga,2024-03-01,60
+training,2,3,Boxing,Boxing,2024-03-02,45
+training,3,4,Crossfit,Crossfit,2024-03-03,30
+training,4,5,Strength Training,Strength Training,2024-03-04,50
+training,5,1,Pilates,Pilates,2024-03-05,40
