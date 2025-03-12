@@ -2,6 +2,7 @@ package com.gym.service;
 
 import com.gym.dao.TraineeDao;
 import com.gym.model.Trainee;
+import com.gym.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,14 @@ public class TraineeService {
     }
 
     public void create(Trainee trainee) {
-        if (traineeDao.existsByUsername(trainee.getUsername())) {
-            log.warn("Trainee with username {} already exists", trainee.getUsername());
-            throw new IllegalArgumentException("Trainee with this username already exists");
-        }
+        String username = UserUtil.generateUsername(
+                trainee.getFirstname(),
+                trainee.getLastname(),
+                traineeDao::existsByUsername
+        );
+        trainee.setUsername(username);
+        trainee.setPassword(UserUtil.generatePassword());
+
         traineeDao.save(trainee);
         log.info("Created new trainee: {}", trainee);
     }

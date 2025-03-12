@@ -31,7 +31,7 @@ public class TrainingDao {
             return training;
         } else {
             log.warn("Training with id {} not found for update", training.getId());
-            return null;
+            throw new IllegalArgumentException("Training with id " + training.getId() + " not found");
         }
     }
 

@@ -31,7 +31,7 @@ public class TraineeDao {
             return trainee;
         } else {
             log.warn("Trainee with id {} not found for update", trainee.getId());
-            return null;
+            throw new IllegalArgumentException("Trainee with id " + trainee.getId() + " not found");
         }
     }
 

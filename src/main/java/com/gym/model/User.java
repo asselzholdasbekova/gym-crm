@@ -15,8 +15,6 @@ public abstract class User {
     public User(String firstname, String lastname, boolean isActive) {
         this.firstname = firstname;
         this.lastname = lastname;
-        this.username = UserUtil.generateUsername(firstname, lastname);
-        this.password = UserUtil.generatePassword();
         this.isActive = isActive;
     }
 

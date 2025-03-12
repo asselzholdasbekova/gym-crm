@@ -1,26 +1,27 @@
 package com.gym.util;
 
 import java.security.SecureRandom;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class UserUtil {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int PASSWORD_LENGTH = 10;
 
-    private static final Map<String, Integer> usernameTracker = new ConcurrentHashMap<>();
-
     /**
-     * Generates a unique username by combining first name and last name.
-     * If the username already exists, adds a serial number.
+     * Generates a unique username by checking its existence using the given predicate.
      */
-    public static String generateUsername(String firstname, String lastname) {
-        String baseUsername = firstname + "." + lastname;
-        int count = usernameTracker.getOrDefault(baseUsername, 0) + 1;
-        usernameTracker.put(baseUsername, count);
+    public static String generateUsername(String firstname, String lastname, Predicate<String> existsByUsername) {
+        int suffix = 1;
+        String username = normalize(firstname) + "." + normalize(lastname);
+        String base = username;
 
-        return (count == 1) ? baseUsername : baseUsername + count;
+        while (existsByUsername.test(username)) {
+            username = base + suffix;
+            suffix++;
+        }
+
+        return username;
     }
 
     /**
@@ -32,5 +33,12 @@ public class UserUtil {
             password.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
         }
         return password.toString();
+    }
+
+    /**
+     * Normalizes a string by converting it to lowercase and replacing spaces.
+     */
+    private static String normalize(String name) {
+        return name.trim().toLowerCase().replaceAll("\\s+", "_");
     }
 }

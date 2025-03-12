@@ -31,7 +31,7 @@ public class TrainerDao {
             return trainer;
         } else {
             log.warn("Trainer with id {} not found for update", trainer.getId());
-            return null;
+            throw new IllegalArgumentException("Trainer with id " + trainer.getId() + " not found");
         }
     }
 
@@ -51,8 +51,8 @@ public class TrainerDao {
         }
     }
 
-    public boolean existsByName(String firstName, String lastName) {
+    public boolean existsByUsername(String username) {
         return storage.getTrainers().values().stream()
-                .anyMatch(trainer -> trainer.getFirstname().equals(firstName) && trainer.getLastname().equals(lastName));
+                .anyMatch(trainer -> trainer.getUsername().equals(username));
     }
 }

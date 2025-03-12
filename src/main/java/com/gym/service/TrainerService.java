@@ -2,6 +2,7 @@ package com.gym.service;
 
 import com.gym.dao.TrainerDao;
 import com.gym.model.Trainer;
+import com.gym.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,16 @@ public class TrainerService {
     }
 
     public void create(Trainer trainer) {
+        String username = UserUtil.generateUsername(
+                trainer.getFirstname(),
+                trainer.getLastname(),
+                trainerDao::existsByUsername
+        );
+        trainer.setUsername(username);
+        trainer.setPassword(UserUtil.generatePassword());
+
         trainerDao.save(trainer);
-        log.info("Trainer created: {}", trainer);
+        log.info("Created new trainer: {}", trainer);
     }
 
     public Trainer update(Trainer trainer) {

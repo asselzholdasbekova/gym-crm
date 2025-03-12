@@ -53,6 +53,10 @@ public class Storage {
                             long id = Long.parseLong(fields[1]);
                             Trainee trainee = new Trainee(fields[2], fields[3], Boolean.parseBoolean(fields[4]),
                                     LocalDate.parse(fields[5]), fields[6]);
+                            String username = fields[7];
+                            String password = fields[8];
+                            trainee.setUsername(username);
+                            trainee.setPassword(password);
                             trainees.put(id, trainee);
                             log.info("Trainee added: {}", trainee);
                         }
@@ -60,6 +64,10 @@ public class Storage {
                             long id = Long.parseLong(fields[1]);
                             Trainer trainer = new Trainer(fields[2], fields[3], Boolean.parseBoolean(fields[4]),
                                     new TrainingType(fields[5]));
+                            String username = fields[6];
+                            String password = fields[7];
+                            trainer.setUsername(username);
+                            trainer.setPassword(password);
                             trainers.put(id, trainer);
                             log.info("Trainer added: {}", trainer);
                         }
