@@ -8,8 +8,8 @@ trainer,2,Emily,Davis,true,Boxing,emily.davis,password123
 trainer,3,James,Wilson,false,Crossfit,james.wilson,password123
 trainer,4,Sophia,Moore,true,Strength Training,sophia.moore,password123
 trainer,5,William,Lee,true,Pilates,william.lee,password123
-training,1,2,Yoga,Yoga,2024-03-01,60
-training,2,3,Boxing,Boxing,2024-03-02,45
-training,3,4,Crossfit,Crossfit,2024-03-03,30
-training,4,5,Strength Training,Strength Training,2024-03-04,50
-training,5,1,Pilates,Pilates,2024-03-05,40
+training,1,1,2,Yoga,Yoga,2024-03-01,60
+training,2,2,3,Boxing,Boxing,2024-03-02,45
+training,3,3,4,Crossfit,Crossfit,2024-03-03,30
+training,4,4,5,Strength Training,Strength Training,2024-03-04,50
+training,5,5,1,Pilates,Pilates,2024-03-05,40
