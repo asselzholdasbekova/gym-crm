@@ -29,7 +29,7 @@ public class User {
     @NaturalId
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 10)
     private String password;
 
     @Column(name = "is_active")

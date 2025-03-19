@@ -1,6 +1,9 @@
 package com.gym.util;
 
+import com.gym.model.User;
+
 import java.security.SecureRandom;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class UserUtil {
@@ -44,5 +47,11 @@ public class UserUtil {
      */
     private static String normalize(String name) {
         return name.trim().toLowerCase().replaceAll("\\s+", "_");
+    }
+
+    public static void authenticate(Optional<User> user, String password) {
+        if (user.isEmpty() || !PasswordEncoder.matches(password, user.get().getPassword())) {
+            throw new SecurityException("Invalid username or password");
+        }
     }
 }

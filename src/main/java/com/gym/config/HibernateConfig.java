@@ -56,6 +56,7 @@ public class HibernateConfig {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", dialect);
         properties.put("hibernate.show_sql", showSql);
+        properties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
 
         return properties;
     }

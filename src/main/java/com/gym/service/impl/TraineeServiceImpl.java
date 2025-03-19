@@ -1,11 +1,9 @@
 package com.gym.service.impl;
 
-import com.gym.model.Trainee;
-import com.gym.model.Trainer;
-import com.gym.model.Training;
-import com.gym.model.TrainingType;
+import com.gym.model.*;
 import com.gym.repository.TraineeRepository;
 import com.gym.repository.TrainingRepository;
+import com.gym.repository.UserRepository;
 import com.gym.service.TraineeService;
 import com.gym.util.PasswordEncoder;
 import com.gym.util.UserUtil;
@@ -19,28 +17,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 @Slf4j
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeRepository traineeRepository;
     private final TrainingRepository trainingRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public TraineeServiceImpl(TraineeRepository traineeRepository, TrainingRepository trainingRepository) {
+    public TraineeServiceImpl(TraineeRepository traineeRepository, TrainingRepository trainingRepository, UserRepository userRepository) {
         this.traineeRepository = traineeRepository;
         this.trainingRepository = trainingRepository;
-
-    }
-
-    private void authenticate(String username, String password) {
-        Optional<Trainee> trainee = traineeRepository.findByUsername(username);
-        if (trainee.isEmpty() || !PasswordEncoder.matches(password, trainee.get().getPassword())) {
-            log.warn("Authentication failed for username: {}", username);
-            throw new SecurityException("Invalid username or password");
-        }
+        this.userRepository = userRepository;
     }
 
     @Override
+    @Transactional
     public Trainee create(Trainee trainee) {
         log.info("Creating new trainee: Firstname = {}, Lastname = {}", trainee.getFirstname(), trainee.getLastname());
 
@@ -58,8 +49,10 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @Transactional
     public Trainee update(Trainee trainee, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Updating trainee: ID = {}, Username = {}", trainee.getId(), trainee.getUsername());
         Trainee updatedTrainee = traineeRepository.update(trainee);
@@ -69,7 +62,8 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Optional<Trainee> findById(Long id, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Finding trainee by ID: {}", id);
         Optional<Trainee> trainee = traineeRepository.findById(id);
@@ -79,17 +73,19 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Optional<Trainee> findByUsername(String targetUsername, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Finding trainee by username: {}", username);
-        Optional<Trainee> trainee = traineeRepository.findByUsername(username);
+        Optional<Trainee> trainee = traineeRepository.findByUsername(targetUsername);
         log.info("Trainee {} found by username: {}", trainee.isPresent() ? "" : "not", username);
         return trainee;
     }
 
     @Override
     public List<Trainee> findAll(String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Fetching all trainees");
         List<Trainee> trainees = traineeRepository.findAll();
@@ -98,8 +94,10 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Deleting trainee by ID: {}", id);
         traineeRepository.deleteById(id);
@@ -107,17 +105,21 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @Transactional
     public void deleteByUsername(String targetUsername, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
-        log.info("Deleting trainee by username: {}", username);
-        traineeRepository.deleteByUsername(username);
-        log.info("Trainee deleted by username: {}", username);
+        log.info("Deleting trainee by username: {}", targetUsername);
+        traineeRepository.deleteByUsername(targetUsername);
+        log.info("Trainee deleted by username: {}", targetUsername);
     }
 
     @Override
+    @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
-        authenticate(username, oldPassword);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, oldPassword);
 
         log.info("Attempting to change password for username: {}", username);
 
@@ -136,36 +138,43 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @Transactional
     public void updateStatus(String targetUsername, String username, String password) {
-        authenticate(username, password);
-        log.info("Updating status for trainee: {}", username);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
-        Trainee trainee = traineeRepository.findByUsername(username)
+        log.info("Updating status for trainee: {}", targetUsername);
+
+        Trainee trainee = traineeRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
 
         trainee.setActive(!trainee.isActive());
         traineeRepository.update(trainee);
 
-        log.info("Trainee status updated: Username = {}, New Status = {}", username, trainee.isActive());
+        log.info("Trainee status updated: Username = {}, New Status = {}", targetUsername, trainee.isActive());
     }
 
     @Override
     public List<Training> findTrainingsList(String targetUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername, TrainingType trainingType, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         return trainingRepository.findByDto(targetUsername, fromDate, toDate, trainerUsername);
     }
 
     @Override
     public List<Trainer> findNotAssignedTrainers(String targetUsername, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         return traineeRepository.findNotAssignedTrainers(targetUsername);
     }
 
     @Override
+    @Transactional
     public void updateTrainersList(String targetUsername, List<Trainer> trainers, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         Trainee trainee = traineeRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new IllegalArgumentException("Trainee not found"));

@@ -3,8 +3,10 @@ package com.gym.service.impl;
 import com.gym.model.Trainer;
 import com.gym.model.Training;
 import com.gym.model.TrainingType;
+import com.gym.model.User;
 import com.gym.repository.TrainerRepository;
 import com.gym.repository.TrainingRepository;
+import com.gym.repository.UserRepository;
 import com.gym.service.TrainerService;
 import com.gym.util.PasswordEncoder;
 import com.gym.util.UserUtil;
@@ -22,20 +24,14 @@ import java.util.Optional;
 public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingRepository trainingRepository) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingRepository trainingRepository, UserRepository userRepository) {
         this.trainerRepository = trainerRepository;
         this.trainingRepository = trainingRepository;
+        this.userRepository = userRepository;
 
-    }
-
-    private void authenticate(String username, String password) {
-        Optional<Trainer> trainer = trainerRepository.findByUsername(username);
-        if (trainer.isEmpty() || !PasswordEncoder.matches(password, trainer.get().getPassword())) {
-            log.warn("Authentication failed for username: {}", username);
-            throw new SecurityException("Invalid username or password");
-        }
     }
 
     @Override
@@ -59,7 +55,8 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Trainer update(Trainer trainer, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Updating trainer: ID = {}, Username = {}", trainer.getId(), trainer.getUsername());
         Trainer updatedTrainer = trainerRepository.update(trainer);
@@ -69,7 +66,8 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Optional<Trainer> findById(Long id, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Finding trainer by ID: {}", id);
         Optional<Trainer> trainer = trainerRepository.findById(id);
@@ -79,17 +77,19 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Optional<Trainer> findByUsername(String targetUsername, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
-        log.info("Finding trainer by username: {}", username);
-        Optional<Trainer> trainer = trainerRepository.findByUsername(username);
-        log.info("Trainer {} found by username: {}", trainer.isPresent() ? "" : "not", username);
+        log.info("Finding trainer by username: {}", targetUsername);
+        Optional<Trainer> trainer = trainerRepository.findByUsername(targetUsername);
+        log.info("Trainer {} found by username: {}", trainer.isPresent() ? "" : "not", targetUsername);
         return trainer;
     }
 
     @Override
     public List<Trainer> findAll(String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Fetching all trainers");
         List<Trainer> trainers = trainerRepository.findAll();
@@ -100,7 +100,8 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public void deleteById(Long id, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         log.info("Deleting trainer by ID: {}", id);
         trainerRepository.deleteById(id);
@@ -110,17 +111,19 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public void deleteByUsername(String targetUsername, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
-        log.info("Deleting trainer by username: {}", username);
-        trainerRepository.deleteByUsername(username);
-        log.info("Trainer deleted by username: {}", username);
+        log.info("Deleting trainer by username: {}", targetUsername);
+        trainerRepository.deleteByUsername(targetUsername);
+        log.info("Trainer deleted by username: {}", targetUsername);
     }
 
     @Override
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
-        authenticate(username, oldPassword);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, oldPassword);
 
         log.info("Attempting to change password for username: {}", username);
 
@@ -141,21 +144,24 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public void updateStatus(String targetUsername, String username, String password) {
-        authenticate(username, password);
-        log.info("Updating status for trainer: {}", username);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
-        Trainer trainer = trainerRepository.findByUsername(username)
+        log.info("Updating status for trainer: {}", targetUsername);
+
+        Trainer trainer = trainerRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
 
         trainer.setActive(!trainer.isActive());
         trainerRepository.update(trainer);
 
-        log.info("Trainer status updated: Username = {}, New Status = {}", username, trainer.isActive());
+        log.info("Trainer status updated: Username = {}, New Status = {}", targetUsername, trainer.isActive());
     }
 
     @Override
     public List<Training> findTrainingsList(String targetUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername, TrainingType trainingType, String username, String password) {
-        authenticate(username, password);
+        Optional<User> user = userRepository.findByUsername(username);
+        UserUtil.authenticate(user, password);
 
         return trainingRepository.findByDto(targetUsername, fromDate, toDate, trainerUsername);
     }

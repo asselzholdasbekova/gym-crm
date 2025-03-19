@@ -28,7 +28,7 @@ class TraineeRepositoryImpl implements TraineeRepository {
 
     @Override
     public Trainee update(Trainee trainee) {
-        return (Trainee) sessionFactory.getCurrentSession().merge(trainee);
+        return sessionFactory.getCurrentSession().merge(trainee);
     }
 
     @Override

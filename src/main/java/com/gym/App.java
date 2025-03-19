@@ -3,14 +3,9 @@ package com.gym;
 import com.gym.config.AppConfig;
 import com.gym.facade.GymFacade;
 import com.gym.model.Trainee;
-import com.gym.service.TraineeService;
-import com.gym.service.TrainerService;
-import com.gym.service.TrainingService;
-import com.gym.util.PasswordEncoder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class App {

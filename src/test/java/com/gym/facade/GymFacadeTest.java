@@ -109,10 +109,22 @@ class GymFacadeTest {
     @Test
     void testFindTrainingsList() {
         List<Training> trainings = List.of(new Training(), new Training());
-        when(traineeService.findTrainingsList("trainee", LocalDate.now(), LocalDate.now(), "trainer", new TrainingType(), "user", "pass"))
-                .thenReturn(trainings);
 
-        List<Training> result = gymFacade.findTrainerTrainings("trainee", LocalDate.now(), LocalDate.now(), "trainer", new TrainingType(), "user", "pass");
+        when(traineeService.findTrainingsList(
+                eq("trainee"),
+                any(LocalDate.class),
+                any(LocalDate.class),
+                eq("trainer"),
+                any(TrainingType.class),
+                eq("user"),
+                eq("pass")
+        )).thenReturn(trainings);
+
+        List<Training> result = gymFacade.findTraineeTrainings(
+                "trainee", LocalDate.now(), LocalDate.now(), "trainer", new TrainingType(), "user", "pass"
+        );
+
         assertEquals(2, result.size());
     }
+
 }

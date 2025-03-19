@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS trainer_trainee;
+DROP TABLE IF EXISTS training;
+DROP TABLE IF EXISTS trainers;
+DROP TABLE IF EXISTS training_types;
+DROP TABLE IF EXISTS trainees;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     firstname VARCHAR NOT NULL,
