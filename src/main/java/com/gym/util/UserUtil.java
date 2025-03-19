@@ -8,6 +8,10 @@ public class UserUtil {
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int PASSWORD_LENGTH = 10;
 
+    private UserUtil() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     /**
      * Generates a unique username by checking its existence using the given predicate.
      */

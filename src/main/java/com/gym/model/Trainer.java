@@ -1,28 +1,31 @@
 package com.gym.model;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString(callSuper = true)
+@Entity
+@Table(name = "trainers")
+@PrimaryKeyJoinColumn(name = "id")
 public class Trainer extends User {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "training_type_id", nullable = false)
     private TrainingType specialization;
-    private Long userId;
 
-    public Trainer() {}
+    @ManyToMany(mappedBy = "trainers")
+    private List<Trainee> trainees;
 
-    public Trainer(String firstname, String lastname, boolean isActive, TrainingType specialization) {
-        super(firstname, lastname, isActive);
-        this.specialization = specialization;
-    }
-
-    public TrainingType getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(TrainingType specialization) {
-        this.specialization = specialization;
-    }
-
-    @Override
-    public String toString() {
-        return "Trainer{" +
-                "specialization=" + specialization +
-                '}';
-    }
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "trainer", orphanRemoval = true)
+    private List<Training> trainings;
 }
+
+

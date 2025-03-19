@@ -1,5 +1,8 @@
 package com.gym.facade;
 
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.gym.model.Trainee;
 import com.gym.model.Trainer;
 import com.gym.model.Training;
@@ -14,12 +17,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class GymFacadeTest {
 
@@ -35,36 +34,85 @@ class GymFacadeTest {
     @InjectMocks
     private GymFacade gymFacade;
 
-    private Trainee trainee;
-    private Trainer trainer;
-    private Training training;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        trainer = new Trainer("Алексей", "Петров", true, new TrainingType("Cardio"));
-        trainee = new Trainee("Иван", "Иванов", true, LocalDate.parse("2000-01-01"), "Фурманова 2");
-        training = new Training(trainer, trainee, "Кардио", new TrainingType("Cardio"), LocalDate.now(), 60);
     }
 
     @Test
-    void testGetAllTrainees() {
-        List<Trainee> trainees = Arrays.asList(trainee);
-        when(traineeService.findAll()).thenReturn(trainees);
-        assertEquals(1, gymFacade.findAllTrainees().size());
+    void testCreateTrainee() {
+        Trainee trainee = new Trainee();
+        when(traineeService.create(trainee)).thenReturn(trainee);
+
+        Trainee result = gymFacade.createTrainee(trainee);
+        assertEquals(trainee, result);
     }
 
     @Test
-    void testGetAllTrainers() {
-        List<Trainer> trainers = Arrays.asList(trainer);
-        when(trainerService.findAll()).thenReturn(trainers);
-        assertEquals(1, gymFacade.findAllTrainers().size());
+    void testFindTraineeById() {
+        Long id = 1L;
+        Trainee trainee = new Trainee();
+        when(traineeService.findById(id, "user", "pass")).thenReturn(Optional.of(trainee));
+
+        Optional<Trainee> result = gymFacade.findTraineeById(id, "user", "pass");
+        assertTrue(result.isPresent());
+        assertEquals(trainee, result.get());
     }
 
     @Test
-    void testGetAllTrainings() {
-        List<Training> trainings = Arrays.asList(training);
-        when(trainingService.findAll()).thenReturn(trainings);
-        assertEquals(1, gymFacade.findAllTrainings().size());
+    void testFindAllTrainees() {
+        List<Trainee> trainees = List.of(new Trainee(), new Trainee());
+        when(traineeService.findAll("user", "pass")).thenReturn(trainees);
+
+        List<Trainee> result = gymFacade.findAllTrainees("user", "pass");
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testCreateTrainer() {
+        Trainer trainer = new Trainer();
+        when(trainerService.create(trainer)).thenReturn(trainer);
+
+        Trainer result = gymFacade.createTrainer(trainer);
+        assertEquals(trainer, result);
+    }
+
+    @Test
+    void testFindTrainerById() {
+        Long id = 1L;
+        Trainer trainer = new Trainer();
+        when(trainerService.findById(id, "user", "pass")).thenReturn(Optional.of(trainer));
+
+        Optional<Trainer> result = gymFacade.findTrainerById(id, "user", "pass");
+        assertTrue(result.isPresent());
+        assertEquals(trainer, result.get());
+    }
+
+    @Test
+    void testFindAllTrainers() {
+        List<Trainer> trainers = List.of(new Trainer(), new Trainer());
+        when(trainerService.findAll("user", "pass")).thenReturn(trainers);
+
+        List<Trainer> result = gymFacade.findAllTrainers("user", "pass");
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testCreateTraining() {
+        Training training = new Training();
+        when(trainingService.create(training)).thenReturn(training);
+
+        Training result = gymFacade.createTraining(training);
+        assertEquals(training, result);
+    }
+
+    @Test
+    void testFindTrainingsList() {
+        List<Training> trainings = List.of(new Training(), new Training());
+        when(traineeService.findTrainingsList("trainee", LocalDate.now(), LocalDate.now(), "trainer", new TrainingType(), "user", "pass"))
+                .thenReturn(trainings);
+
+        List<Training> result = gymFacade.findTrainerTrainings("trainee", LocalDate.now(), LocalDate.now(), "trainer", new TrainingType(), "user", "pass");
+        assertEquals(2, result.size());
     }
 }
