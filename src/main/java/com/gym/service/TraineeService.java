@@ -1,63 +1,25 @@
 package com.gym.service;
 
-import com.gym.dao.TraineeDao;
 import com.gym.model.Trainee;
-import com.gym.util.UserUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.gym.model.Trainer;
+import com.gym.model.Training;
+import com.gym.model.TrainingType;
 
-import java.util.Collection;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
-@Slf4j
-@Service
-public class TraineeService {
-    private TraineeDao traineeDao;
-
-    @Autowired
-    public void setTraineeDao(TraineeDao traineeDao) {
-        this.traineeDao = traineeDao;
-    }
-
-    public void create(Trainee trainee) {
-        String username = UserUtil.generateUsername(
-                trainee.getFirstname(),
-                trainee.getLastname(),
-                traineeDao::existsByUsername
-        );
-        trainee.setUsername(username);
-        trainee.setPassword(UserUtil.generatePassword());
-
-        traineeDao.save(trainee);
-        log.info("Created new trainee: {}", trainee);
-    }
-
-    public Trainee update(Trainee trainee) {
-        Trainee updatedTrainee = traineeDao.update(trainee);
-        if (updatedTrainee != null) {
-            log.info("Updated trainee: {}", updatedTrainee);
-        } else {
-            log.warn("Trainee with id {} not found", trainee.getId());
-        }
-        return updatedTrainee;
-    }
-
-    public Optional<Trainee> findById(Long id) {
-        return traineeDao.findById(id);
-    }
-
-    public Collection<Trainee> findAll() {
-        return traineeDao.findAll();
-    }
-
-    public void deleteById(Long id) {
-        if (traineeDao.findById(id).isPresent()) {
-            traineeDao.deleteById(id);
-            log.info("Deleted trainee with id: {}", id);
-        } else {
-            log.warn("Trainee with id {} not found", id);
-            throw new IllegalArgumentException("Trainee not found");
-        }
-    }
+public interface TraineeService {
+    Trainee create(Trainee trainee);
+    Trainee update(Trainee trainee, String username, String password);
+    Optional<Trainee> findById(Long id, String username, String password);
+    Optional<Trainee> findByUsername(String targetUsername, String username, String password);
+    List<Trainee> findAll( String username, String password);
+    void deleteById(Long id,  String username, String password);
+    void deleteByUsername(String targetUsername,  String username, String password);
+    void changePassword(String username, String oldPassword, String newPassword);
+    void updateStatus(String targetUsername,  String username, String password);
+    List<Training> findTrainingsList(String targetUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername, TrainingType trainingType, String username, String password);
+    List<Trainer> findNotAssignedTrainers(String targetUsername, String username, String password);
+    void updateTrainersList(String targetUsername, List<Trainer> trainers, String username, String password);
 }

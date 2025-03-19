@@ -1,41 +1,36 @@
 package com.gym.model;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
+import java.time.LocalDate;
+import java.util.List;
+
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = "trainers")
+@Entity
+@Table(name = "trainees")
+@PrimaryKeyJoinColumn(name = "id")
 public class Trainee extends User {
+    @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
+
+    @Column(name = "address", nullable = false)
     private String address;
 
-    public Trainee() {}
-
-    public Trainee(String firstname, String lastname, boolean isActive, LocalDate dateOfBirth, String address) {
-        super(firstname, lastname, isActive);
-        this.dateOfBirth = dateOfBirth;
-        this.address = address;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    @Override
-    public String
-    toString() {
-        return "Trainee{" +
-                "dateOfBirth=" + dateOfBirth +
-                ", address='" + address + '\'' +
-                '}';
-    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "trainer_trainee",
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
+    private List<Trainer> trainers;
 }
+

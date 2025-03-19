@@ -1,12 +1,19 @@
 package com.gym.util;
 
+import com.gym.model.User;
+
 import java.security.SecureRandom;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class UserUtil {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int PASSWORD_LENGTH = 10;
+
+    private UserUtil() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     /**
      * Generates a unique username by checking its existence using the given predicate.
@@ -40,5 +47,11 @@ public class UserUtil {
      */
     private static String normalize(String name) {
         return name.trim().toLowerCase().replaceAll("\\s+", "_");
+    }
+
+    public static void authenticate(Optional<User> user, String password) {
+        if (user.isEmpty() || !PasswordEncoder.matches(password, user.get().getPassword())) {
+            throw new SecurityException("Invalid username or password");
+        }
     }
 }

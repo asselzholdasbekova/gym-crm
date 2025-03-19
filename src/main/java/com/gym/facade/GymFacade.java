@@ -3,17 +3,17 @@ package com.gym.facade;
 import com.gym.model.Trainee;
 import com.gym.model.Trainer;
 import com.gym.model.Training;
+import com.gym.model.TrainingType;
 import com.gym.service.TraineeService;
 import com.gym.service.TrainerService;
 import com.gym.service.TrainingService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Component
 public class GymFacade {
     private final TraineeService traineeService;
@@ -27,67 +27,98 @@ public class GymFacade {
         this.trainingService = trainingService;
     }
 
-    // --- Trainee Methods ---
-    public void createTrainee(Trainee trainee) {
-        log.info("Creating trainee: {}", trainee);
-        traineeService.create(trainee);
+    // Trainee operations
+    public Trainee createTrainee(Trainee trainee) {
+        return traineeService.create(trainee);
     }
 
-    public Trainee updateTrainee(Trainee trainee) {
-        return traineeService.update(trainee);
+    public Trainee updateTrainee(Trainee trainee, String username, String password) {
+        return traineeService.update(trainee, username, password);
     }
 
-    public Optional<Trainee> findTraineeById(Long id) {
-        return traineeService.findById(id);
+    public Optional<Trainee> findTraineeById(Long id, String username, String password) {
+        return traineeService.findById(id, username, password);
     }
 
-    public Collection<Trainee> findAllTrainees() {
-        return traineeService.findAll();
+    public Optional<Trainee> findTraineeByUsername(String targetUsername, String username, String password) {
+        return traineeService.findByUsername(targetUsername, username, password);
     }
 
-    public void deleteTraineeById(Long id) {
-        traineeService.deleteById(id);
+    public List<Trainee> findAllTrainees(String username, String password) {
+        return traineeService.findAll(username, password);
     }
 
-    public void createTrainer(Trainer trainer) {
-        log.info("Creating trainer: {}", trainer);
-        trainerService.create(trainer);
+    public void deleteTraineeById(Long id, String username, String password) {
+        traineeService.deleteById(id, username, password);
     }
 
-    public Trainer updateTrainer(Trainer trainer) {
-        return trainerService.update(trainer);
+    public void deleteTraineeByUsername(String targetUsername, String username, String password) {
+        traineeService.deleteByUsername(targetUsername, username, password);
     }
 
-    public Optional<Trainer> findTrainerById(Long id) {
-        return trainerService.findById(id);
+    public void changeTraineePassword(String username, String oldPassword, String newPassword) {
+        traineeService.changePassword(username, oldPassword, newPassword);
     }
 
-    public Collection<Trainer> findAllTrainers() {
-        return trainerService.findAll();
+    public void updateTraineeStatus(String targetUsername, String username, String password) {
+        traineeService.updateStatus(targetUsername, username, password);
     }
 
-    public void deleteTrainerById(Long id) {
-        trainerService.deleteById(id);
+    public List<Training> findTraineeTrainings(String targetUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername, TrainingType trainingType, String username, String password) {
+        return traineeService.findTrainingsList(targetUsername, fromDate, toDate, trainerUsername, trainingType, username, password);
     }
 
-    public void createTraining(Training training) {
-        log.info("Creating training: {}", training);
-        trainingService.create(training);
+    public List<Trainer> findNotAssignedTrainers(String targetUsername, String username, String password) {
+        return traineeService.findNotAssignedTrainers(targetUsername, username, password);
     }
 
-    public Training updateTraining(Training training) {
-        return trainingService.update(training);
+    public void updateTraineeTrainers(String targetUsername, List<Trainer> trainers, String username, String password) {
+        traineeService.updateTrainersList(targetUsername, trainers, username, password);
     }
 
-    public Optional<Training> findTrainingById(Long id) {
-        return trainingService.findById(id);
+    // Trainer operations
+    public Trainer createTrainer(Trainer trainer) {
+        return trainerService.create(trainer);
     }
 
-    public Collection<Training> findAllTrainings() {
-        return trainingService.findAll();
+    public Trainer updateTrainer(Trainer trainer, String username, String password) {
+        return trainerService.update(trainer, username, password);
     }
 
-    public void deleteTrainingById(Long id) {
-        trainingService.deleteById(id);
+    public Optional<Trainer> findTrainerById(Long id, String username, String password) {
+        return trainerService.findById(id, username, password);
+    }
+
+    public Optional<Trainer> findTrainerByUsername(String targetUsername, String username, String password) {
+        return trainerService.findByUsername(targetUsername, username, password);
+    }
+
+    public List<Trainer> findAllTrainers(String username, String password) {
+        return trainerService.findAll(username, password);
+    }
+
+    public void deleteTrainerById(Long id, String username, String password) {
+        trainerService.deleteById(id, username, password);
+    }
+
+    public void deleteTrainerByUsername(String targetUsername, String username, String password) {
+        trainerService.deleteByUsername(targetUsername, username, password);
+    }
+
+    public void changeTrainerPassword(String username, String oldPassword, String newPassword) {
+        trainerService.changePassword(username, oldPassword, newPassword);
+    }
+
+    public void updateTrainerStatus(String targetUsername, String username, String password) {
+        trainerService.updateStatus(targetUsername, username, password);
+    }
+
+    public List<Training> findTrainerTrainings(String targetUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername, TrainingType trainingType, String username, String password) {
+        return trainerService.findTrainingsList(targetUsername, fromDate, toDate, trainerUsername, trainingType, username, password);
+    }
+
+    // Training operations
+    public Training createTraining(Training training) {
+        return trainingService.create(training);
     }
 }

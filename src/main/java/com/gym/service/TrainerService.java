@@ -1,53 +1,23 @@
 package com.gym.service;
 
-import com.gym.dao.TrainerDao;
+import com.gym.model.Trainee;
 import com.gym.model.Trainer;
-import com.gym.util.UserUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.gym.model.Training;
+import com.gym.model.TrainingType;
 
-import java.util.Collection;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
-@Slf4j
-@Service
-public class TrainerService {
-    private TrainerDao trainerDao;
-
-    @Autowired
-    public void setTrainerDao(TrainerDao trainerDao) {
-        this.trainerDao = trainerDao;
-    }
-
-    public void create(Trainer trainer) {
-        String username = UserUtil.generateUsername(
-                trainer.getFirstname(),
-                trainer.getLastname(),
-                trainerDao::existsByUsername
-        );
-        trainer.setUsername(username);
-        trainer.setPassword(UserUtil.generatePassword());
-
-        trainerDao.save(trainer);
-        log.info("Created new trainer: {}", trainer);
-    }
-
-    public Trainer update(Trainer trainer) {
-        log.info("Updating trainer: {}", trainer);
-        return trainerDao.update(trainer);
-    }
-
-    public Optional<Trainer> findById(Long id) {
-        return trainerDao.findById(id);
-    }
-
-    public Collection<Trainer> findAll() {
-        return trainerDao.findAll();
-    }
-
-    public void deleteById(Long id) {
-        trainerDao.deleteById(id);
-        log.info("Trainer deleted with id: {}", id);
-    }
+public interface TrainerService {
+    Trainer create(Trainer trainer);
+    Trainer update(Trainer trainer, String username, String password);
+    Optional<Trainer> findById(Long id, String username, String password);
+    Optional<Trainer> findByUsername(String targetUsername, String username, String password);
+    List<Trainer> findAll( String username, String password);
+    void deleteById(Long id,  String username, String password);
+    void deleteByUsername(String targetUsername,  String username, String password);
+    void changePassword(String username, String oldPassword, String newPassword);
+    void updateStatus(String targetUsername,  String username, String password);
+    List<Training> findTrainingsList(String targetUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername, TrainingType trainingType, String username, String password);
 }
