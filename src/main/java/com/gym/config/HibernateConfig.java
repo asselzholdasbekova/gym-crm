@@ -77,7 +77,7 @@ public class HibernateConfig {
     }
 
     @Bean
-    public HibernateTransactionManager transactionManager(@Qualifier("sessionFactory") SessionFactory sessionFactory) {
+    public HibernateTransactionManager transactionManager(@Qualifier("getSessionFactory") SessionFactory sessionFactory) {
         return new HibernateTransactionManager(sessionFactory);
     }
 }

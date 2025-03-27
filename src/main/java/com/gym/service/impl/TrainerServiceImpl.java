@@ -6,7 +6,6 @@ import com.gym.model.TrainingType;
 import com.gym.model.User;
 import com.gym.repository.TrainerRepository;
 import com.gym.repository.TrainingRepository;
-import com.gym.repository.UserRepository;
 import com.gym.service.TrainerService;
 import com.gym.util.PasswordEncoder;
 import com.gym.util.UserUtil;
@@ -24,13 +23,11 @@ import java.util.Optional;
 public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
-    private final UserRepository userRepository;
 
     @Autowired
-    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingRepository trainingRepository, UserRepository userRepository) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingRepository trainingRepository) {
         this.trainerRepository = trainerRepository;
         this.trainingRepository = trainingRepository;
-        this.userRepository = userRepository;
 
     }
 
@@ -55,7 +52,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Trainer update(Trainer trainer, String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         log.info("Updating trainer: ID = {}, Username = {}", trainer.getId(), trainer.getUsername());
@@ -66,7 +63,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Optional<Trainer> findById(Long id, String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         log.info("Finding trainer by ID: {}", id);
@@ -77,7 +74,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Optional<Trainer> findByUsername(String targetUsername, String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         log.info("Finding trainer by username: {}", targetUsername);
@@ -88,7 +85,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public List<Trainer> findAll(String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         log.info("Fetching all trainers");
@@ -100,7 +97,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public void deleteById(Long id, String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         log.info("Deleting trainer by ID: {}", id);
@@ -111,7 +108,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public void deleteByUsername(String targetUsername, String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         log.info("Deleting trainer by username: {}", targetUsername);
@@ -122,7 +119,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, oldPassword);
 
         log.info("Attempting to change password for username: {}", username);
@@ -144,7 +141,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public void updateStatus(String targetUsername, String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         log.info("Updating status for trainer: {}", targetUsername);
@@ -160,7 +157,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public List<Training> findTrainingsList(String targetUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername, TrainingType trainingType, String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = trainerRepository.findByUsername(username).orElseThrow();
         UserUtil.authenticate(user, password);
 
         return trainingRepository.findByDto(targetUsername, fromDate, toDate, trainerUsername);

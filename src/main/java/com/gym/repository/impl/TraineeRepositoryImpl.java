@@ -2,13 +2,13 @@ package com.gym.repository.impl;
 
 import com.gym.model.Trainee;
 import com.gym.model.Trainer;
-import com.gym.model.Training;
 import com.gym.repository.TraineeRepository;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,62 +22,86 @@ class TraineeRepositoryImpl implements TraineeRepository {
 
     @Override
     public Trainee create(Trainee trainee) {
-        sessionFactory.getCurrentSession().persist(trainee);
-        return trainee;
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            session.persist(trainee);
+            transaction.commit();
+            return trainee;
+        }
     }
 
     @Override
     public Trainee update(Trainee trainee) {
-        return sessionFactory.getCurrentSession().merge(trainee);
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Trainee updatedTrainee = session.merge(trainee);
+            transaction.commit();
+            return updatedTrainee;
+        }
     }
 
     @Override
     public Optional<Trainee> findById(Long id) {
-        return Optional.ofNullable(sessionFactory.getCurrentSession().get(Trainee.class, id));
+        try (Session session = sessionFactory.openSession()) {
+            return Optional.ofNullable(session.get(Trainee.class, id));
+        }
     }
 
     @Override
     public Optional<Trainee> findByUsername(String username) {
-        return sessionFactory.getCurrentSession()
-                .createQuery("FROM Trainee WHERE username = :username", Trainee.class)
-                .setParameter("username", username)
-                .uniqueResultOptional();
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM Trainee WHERE username = :username", Trainee.class)
+                    .setParameter("username", username)
+                    .uniqueResultOptional();
+        }
     }
 
     @Override
     public List<Trainee> findAll() {
-        return sessionFactory.getCurrentSession()
-                .createQuery("FROM Trainee", Trainee.class)
-                .getResultList();
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM Trainee", Trainee.class).getResultList();
+        }
     }
 
     @Override
     public void deleteById(Long id) {
-        findById(id).ifPresent(trainee -> sessionFactory.getCurrentSession().remove(trainee));
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            findById(id).ifPresent(session::remove);
+            transaction.commit();
+        }
     }
 
     @Override
     public void deleteByUsername(String username) {
-        sessionFactory.getCurrentSession()
-                .createMutationQuery("DELETE FROM Trainee WHERE username = :username")
-                .setParameter("username", username)
-                .executeUpdate();
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            session.createMutationQuery("DELETE FROM Trainee WHERE username = :username")
+                    .setParameter("username", username)
+                    .executeUpdate();
+            transaction.commit();
+        }
     }
 
     @Override
     public List<Trainer> findNotAssignedTrainers(String traineeUserName) {
-        return sessionFactory.getCurrentSession()
-                .createQuery("SELECT t FROM Trainer t WHERE t NOT IN (SELECT tr FROM Trainee tr JOIN tr.trainers trainers WHERE tr.username = :traineeUserName)", Trainer.class)
-                .setParameter("traineeUserName", traineeUserName)
-                .getResultList();
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery(
+                            "SELECT t FROM Trainer t WHERE t NOT IN " +
+                                    "(SELECT tr FROM Trainee tr JOIN tr.trainers trainers WHERE tr.username = :traineeUserName)",
+                            Trainer.class)
+                    .setParameter("traineeUserName", traineeUserName)
+                    .getResultList();
+        }
     }
 
     @Override
     public boolean existsByUsername(String username) {
-        Long count = sessionFactory.getCurrentSession()
-                .createQuery("SELECT COUNT(t) FROM Trainee t WHERE t.username = :username", Long.class)
-                .setParameter("username", username)
-                .getSingleResult();
-        return count > 0;
+        try (Session session = sessionFactory.openSession()) {
+            Long count = session.createQuery("SELECT COUNT(t) FROM Trainee t WHERE t.username = :username", Long.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
+            return count > 0;
+        }
     }
 }

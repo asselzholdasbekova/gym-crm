@@ -2,7 +2,9 @@ package com.gym.repository.impl;
 
 import com.gym.model.Training;
 import com.gym.repository.TrainingRepository;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
@@ -19,30 +21,43 @@ class TrainingRepositoryImpl implements TrainingRepository {
 
     @Override
     public Training create(Training training) {
-        sessionFactory.getCurrentSession().persist(training);
-        return training;
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            session.persist(training);
+            transaction.commit();
+            return training;
+        }
     }
 
     @Override
     public List<Training> findByDto(String traineeUsername, LocalDate fromDate, LocalDate toDate, String trainerUsername) {
         String hql = """
-        SELECT t FROM Training t 
-        JOIN t.trainer tr 
-        JOIN t.trainee tn
-        WHERE (:trainerUsername IS NULL OR tr.username = :trainerUsername)
-        AND (:traineeUsername IS NULL OR tn.username = :traineeUsername)
-        AND (:fromDate IS NULL OR t.date >= :fromDate)
-        AND (:toDate IS NULL OR t.date <= :toDate)
-    """;
+            SELECT t FROM Training t 
+            JOIN t.trainer tr 
+            JOIN t.trainee tn
+            WHERE (:trainerUsername IS NULL OR tr.username = :trainerUsername)
+            AND (:traineeUsername IS NULL OR tn.username = :traineeUsername)
+            AND (:fromDate IS NULL OR t.date >= :fromDate)
+            AND (:toDate IS NULL OR t.date <= :toDate)
+        """;
 
-        var query = sessionFactory.getCurrentSession().createQuery(hql, Training.class);
+        try (Session session = sessionFactory.openSession()) {
+            var query = session.createQuery(hql, Training.class);
 
-        query.setParameter("trainerUsername", trainerUsername);
-        query.setParameter("traineeUsername", traineeUsername);
-        query.setParameter("fromDate", fromDate);
-        query.setParameter("toDate", toDate);
+            if (trainerUsername != null) {
+                query.setParameter("trainerUsername", trainerUsername);
+            }
+            if (traineeUsername != null) {
+                query.setParameter("traineeUsername", traineeUsername);
+            }
+            if (fromDate != null) {
+                query.setParameter("fromDate", fromDate);
+            }
+            if (toDate != null) {
+                query.setParameter("toDate", toDate);
+            }
 
-        return query.getResultList();
+            return query.getResultList();
+        }
     }
-
 }

@@ -49,8 +49,8 @@ public class UserUtil {
         return name.trim().toLowerCase().replaceAll("\\s+", "_");
     }
 
-    public static void authenticate(Optional<User> user, String password) {
-        if (user.isEmpty() || !PasswordEncoder.matches(password, user.get().getPassword())) {
+    public static void authenticate(User user, String password) {
+        if (!PasswordEncoder.matches(password, user.getPassword())) {
             throw new SecurityException("Invalid username or password");
         }
     }

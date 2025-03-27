@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS trainer_trainee;
-DROP TABLE IF EXISTS training;
+DROP TABLE IF EXISTS trainings;
 DROP TABLE IF EXISTS trainers;
 DROP TABLE IF EXISTS training_types;
 DROP TABLE IF EXISTS trainees;
@@ -33,7 +33,7 @@ CREATE TABLE trainers (
     FOREIGN KEY (training_type_id) REFERENCES training_types(id)
 );
 
-CREATE TABLE training (
+CREATE TABLE trainings (
     id SERIAL PRIMARY KEY,
     trainer_id INT NOT NULL,
     trainee_id INT NOT NULL,
@@ -75,7 +75,7 @@ INSERT INTO trainers (id, training_type_id) VALUES
 (4, 1),
 (5, 2);
 
-INSERT INTO training (trainer_id, trainee_id, name, training_type_id, date, duration) VALUES
+INSERT INTO trainings (trainer_id, trainee_id, name, training_type_id, date, duration) VALUES
 (4, 1, 'Утренняя тренировка', 1, '2024-03-01', 60),
 (4, 2, 'Интенсивная тренировка', 1, '2024-03-03', 90),
 (5, 3, 'Йога на свежем воздухе', 2, '2024-03-05', 75);
