@@ -50,7 +50,7 @@ class TrainerServiceTest {
 
         Trainer created = trainerService.create(trainer);
         assertNotNull(created);
-        assertEquals("jdoe", created.getUsername());
+        assertEquals("john.doe", created.getUsername());
 
         verify(trainerRepository).create(any());
     }

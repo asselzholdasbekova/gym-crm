@@ -1,18 +1,17 @@
 package com.gym.service;
 
-import com.gym.model.Trainee;
-import com.gym.model.Trainer;
-import com.gym.model.Training;
-import com.gym.model.TrainingType;
+import com.gym.model.*;
 import com.gym.repository.TraineeRepository;
 import com.gym.repository.TrainingRepository;
 import com.gym.service.impl.TraineeServiceImpl;
 import com.gym.util.PasswordEncoder;
+import com.gym.util.UserUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -66,7 +65,10 @@ class TraineeServiceTest {
     @Test
     void testCreate() {
         when(traineeRepository.create(any(Trainee.class))).thenReturn(trainee);
-        Trainee createdTrainee = traineeService.create(new Trainee());
+        Trainee trainee = new Trainee();
+        trainee.setFirstname("John");
+        trainee.setLastname("Doe");
+        Trainee createdTrainee = traineeService.create(trainee);
         assertNotNull(createdTrainee);
         verify(traineeRepository, times(1)).create(any(Trainee.class));
     }
@@ -133,10 +135,16 @@ class TraineeServiceTest {
 
     @Test
     void testFindTrainingsList() {
-        when(trainingRepository.findByDto("testUser", LocalDate.now().minusDays(7), LocalDate.now(), "trainerUser"))
-                .thenReturn(List.of(training));
-        List<Training> trainings = traineeService.findTrainingsList("testUser", LocalDate.now().minusDays(7), LocalDate.now(), "trainerUser", trainingType, "testUser", "password");
-        assertFalse(trainings.isEmpty());
+        LocalDate fromDate = LocalDate.now().minusDays(7);
+        LocalDate toDate = LocalDate.now();
+
+        when(traineeRepository.findByUsername("testUser")).thenReturn(Optional.of(trainee));
+        when(trainingRepository.findByDto("traineeUser", fromDate, toDate, "jdoe"))
+                .thenReturn(List.of(new Training()));
+
+        List<Training> trainings = traineeService.findTrainingsList("traineeUser", fromDate, toDate, "jdoe", null, "testUser", "password");
+
+        assertEquals(1, trainings.size());
     }
 
     @Test
